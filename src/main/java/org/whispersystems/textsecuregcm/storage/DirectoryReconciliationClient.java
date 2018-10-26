@@ -31,6 +31,9 @@ import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -74,7 +77,8 @@ public class DirectoryReconciliationClient {
       throws CertificateException
   {
     try {
-      PEMReader       reader      = new PEMReader(new InputStreamReader(new ByteArrayInputStream(caCertificatePem.getBytes())));
+      Path path                   = Paths.get(caCertificatePem);
+      PEMReader       reader      = new PEMReader(new InputStreamReader(new ByteArrayInputStream(Files.readAllBytes(path))));
       X509Certificate certificate = (X509Certificate) reader.readObject();
 
       if (certificate == null) {
