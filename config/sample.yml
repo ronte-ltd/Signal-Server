@@ -13,8 +13,9 @@ twilio: # Twilio gateway configuration
 push:
   queueSize: # Size of push pending queue
 
-redphone:
-  authKey: # Deprecated
+pushScheduler:
+  url:
+  replicaUrls:
 
 turn: # TURN server configuration
   secret: # TURN server secret
@@ -47,8 +48,9 @@ directory:
     reconciliationChunkIntervalMs: # CDS reconciliation chunk interval, in milliseconds
 
 messageCache: # Redis server configuration for message store cache
-  url:
-  replicaUrls:
+  redis:
+    url:
+    replicaUrls:
 
 messageStore: # Postgresql database configuration for message store
   driverClass: org.postgresql.Driver
