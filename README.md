@@ -28,10 +28,10 @@ Licensed under the AGPLv3: https://www.gnu.org/licenses/agpl-3.0.html
 Launch server
 ---------------------
 
-***Server configuration:***
-- Copy configuration file: `cp config/sample.yml config/config.yml`
+***Server configuration:***  
+- Copy configuration file `cp config/sample.yml config/config.yml`
 - Update configuration `config/config.yml`
-- put AWS configuration to `~/.aws/config`. Add the next lines:  
+- Put AWS configuration to `~/.aws/config`. Add the next lines:  
 ```markdown
 [default]
 aws_access_key_id={key_id}
@@ -39,12 +39,12 @@ aws_secret_access_key={access_key}
 region={region}
 ```
 
-***Compile application:***
+***Compile application:***  
 `mvn clean install -DskipTests`
 
-***Migrate db***
+***Migrate db:***  
 `java -jar target/TextSecureServer-1.92.jar accountdb migrate config/config.yml`
 
-***Run server***
+***Run server:***  
 `java -jar target/TextSecureServer-1.92.jar server config/config.yml`
 
