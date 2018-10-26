@@ -10,15 +10,11 @@ import com.nurkiewicz.asyncretry.AsyncRetryExecutor;
 import com.nurkiewicz.asyncretry.RetryContext;
 import com.nurkiewicz.asyncretry.RetryExecutor;
 import com.nurkiewicz.asyncretry.function.RetryCallable;
-import com.relayrides.pushy.apns.ApnsClient;
-import com.relayrides.pushy.apns.ApnsClientBuilder;
-import com.relayrides.pushy.apns.ApnsServerException;
-import com.relayrides.pushy.apns.ClientNotConnectedException;
-import com.relayrides.pushy.apns.DeliveryPriority;
-import com.relayrides.pushy.apns.PushNotificationResponse;
+import com.relayrides.pushy.apns.*;
 import com.relayrides.pushy.apns.metrics.dropwizard.DropwizardApnsClientMetricsListener;
 import com.relayrides.pushy.apns.util.SimpleApnsPushNotification;
-
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import org.bouncycastle.openssl.PEMReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +23,6 @@ import org.whispersystems.textsecuregcm.util.Constants;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -37,8 +32,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 
 public class RetryingApnsClient {
 
@@ -111,10 +104,27 @@ public class RetryingApnsClient {
 
   private static PrivateKey initializePrivateKey(String pemKey) throws IOException {
     PEMReader reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(pemKey.getBytes())));
-    return ((KeyPair) reader.readObject()).getPrivate();
+//    return ((KeyPair) reader.readObject()).getPrivate();
+    //todo temp solution. Need valid certificate
+    return new PrivateKey() {
+      @Override
+      public String getAlgorithm() {
+        return null;
+      }
+
+      @Override
+      public String getFormat() {
+        return null;
+      }
+
+      @Override
+      public byte[] getEncoded() {
+        return new byte[0];
+      }
+    };
   }
 
-  private static final class ResponseHandler implements GenericFutureListener<io.netty.util.concurrent.Future<PushNotificationResponse<SimpleApnsPushNotification>>> {
+  private static final class ResponseHandler implements GenericFutureListener<Future<PushNotificationResponse<SimpleApnsPushNotification>>> {
 
     private final ApnsClient                client;
     private final SettableFuture<ApnResult> future;
@@ -125,7 +135,7 @@ public class RetryingApnsClient {
     }
 
     @Override
-    public void operationComplete(io.netty.util.concurrent.Future<PushNotificationResponse<SimpleApnsPushNotification>> result) {
+    public void operationComplete(Future<PushNotificationResponse<SimpleApnsPushNotification>> result) {
       try {
         PushNotificationResponse<SimpleApnsPushNotification> response = result.get();
 
